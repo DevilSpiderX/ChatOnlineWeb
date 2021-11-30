@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!-- js -->
+    <script src="https://code.bdstatic.com/npm/jquery@3.5.0/dist/jquery.min.js"></script>
+</head>
+<body>
+<div id="main" style="width: 500px">
+    uid:<input>
+    pwd:<input type="password">
+    <button style="width: 200px">按钮</button>
+    <button style="width: 200px" disabled>发送123</button>
+    <p></p>
+</div>
+<script>
+    let buttons = $("#main button");
+    buttons.get(0).onclick = register;
+
+    let ws = null
+
+    function register() {
+        let inputs = $("#main input");
+        let data = {
+            "uid": inputs.get(0).value,
+            "pwd": inputs.get(1).value
+        }
+        $.ajax("/login", {
+            type: "POST", data: data,
+            success: function (data) {
+                console.log(data);
+                $("#main p").get(0).innerText = "code:" + data["code"] + "\nmsg:" + data["msg"];
+                if (data["code"] === "0") {
+                    ws = new WebSocket("ws://" + location.host + "/websocket/" + inputs.get(0).value);
+                    ws.onopen = function (event) {
+                        console.log(event);
+                        console.log("接入");
+                    }
+                    ws.onmessage = function (event) {
+                        // console.log(event.data);
+                        console.log(JSON.parse(event.data));
+                    }
+                    ws.onclose = function () {
+                        console.log("连接已关闭");
+                    };
+                    ws.onerror = function (event) {
+                        alert("发生错误" + event);
+                        console.log(event);
+                    };
+                    buttons.get(1).disabled = false;
+                }
+            }
+        })
+    }
+
+    buttons.get(1).onclick = function () {
+        let data = {
+            "cmd": "sendMessage",
+            "receiver_uid": "1908170201",
+            "msg": "123"
+        }
+        ws.send(JSON.stringify(data));
+    };
+
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>404 Not Found</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!-- js -->
+    <script src="../static/js/jquery.min.js"></script>
+</head>
+<style>
+    body {
+        background-color: #dcdcdc;
+    }
+
+    h1, h2, p {
+        text-align: center;
+        font-family: 楷体, monospace;
+        font-size: 30px;
+    }
+</style>
+<body>
+<div id="main">
+    <h1 style="font-size: 100px">404</h1>
+    <h2>Not Found</h2>
+    <p id="msg">The requested URL </p>
+</div>
+<script>
+    let paths = document.URL.split(/\/+|\?/);
+    let path = "";
+    if (paths.length === 3) {
+        path += "/" + paths[2];
+    } else {
+        for (let i = 2; i < paths.length - 1; i++) {
+            path += "/" + paths[i];
+        }
+    }
+    let msgP = $("#msg");
+    msgP.text(msgP.text() + path + " was not found on this server.");
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+html, body {
+    background-color: #DCDCDC;
+}
+
+div#login-fa {
+    border: #6c757d 5px solid;
+    border-radius: 2ex;
+    margin-top: 100px;
+}
+
+div#login-fa > h1,
+div#login-fa > div.input-group,
+div#login-fa > div.row {
+    margin: 10px 0;
+}
+
+div#login-fa > div.row > button,
+div#login-fa > div.row > a {
+    margin: 10px 0;
+    width: 100px;
+}
