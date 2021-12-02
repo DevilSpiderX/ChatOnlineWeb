@@ -19,7 +19,7 @@ function on_button0_clicked() {
             //0 成功；1 密码错误；2 uid参数不存在；3 pwd参数不存在;4 uid不存在；
             switch (data["code"]) {
                 case "0": {
-                    window.location = "./panel.html?uid=" + uid;
+                    window.location = "./panel.html?uid=" + uid + "&token=" + data["token"];
                     break;
                 }
                 case "1": {

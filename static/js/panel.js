@@ -1,9 +1,7 @@
-const uid = getQueryVariable("uid");
-const ws = new WebSocket("ws://" + location.host + "/websocket/" + uid);
+const own_uid = getQueryVariable("uid");
+const token = getQueryVariable("token");
+const ws = new WebSocket("ws://" + location.host + "/websocket/" + own_uid + "/" + token);
 
-/**
- * 初始化面板
- */
 initHtml();
 
 function getQueryVariable(variable) {
@@ -15,31 +13,25 @@ function getQueryVariable(variable) {
             return pair[1];
         }
     }
-    return null;
+    return "null";
 }
 
+/**
+ * 初始化面板
+ */
 function initHtml() {
-    let postBody = {
-        "uid": uid
-    }
-    $.ajax("/getInformation", {
-        type: "POST", data: postBody,
-        success: function (data) {
-            switch (data["code"]) {
-                case "0" : {
-                    let title = "用户面板 - " + data["msg"]["nick"] + " - ChatOnline"
-                    $("head title").text(title);
-                    break;
-                }
-                case "3" : {
-                    alert(data["msg"]);
-                    window.location = "./login.html";
-                    break;
-                }
+    getInformation(own_uid, function (data) {
+        switch (data["code"]) {
+            case "0" : {
+                let title = "用户面板 - " + data["msg"]["nick"] + " - ChatOnline"
+                $("head title").text(title);
+                break;
             }
-        },
-        error: function () {
-            location.reload();
+            case "3" : {
+                alert(data["msg"]);
+                window.location = "./login.html";
+                break;
+            }
         }
     });
     ws.onopen = wsOnOpen;
@@ -50,14 +42,85 @@ function initHtml() {
 
 /* ↓↓这一块是写POST的方法的↓↓ */
 function logout() {
+    let postBody = {
+        "uid": own_uid
+    };
     $.ajax("/logout", {
-        type: "POST",
+        type: "POST", data: postBody,
         success: function (data) {
             if (data["code"] !== "0") {
                 alert(data["msg"]);
             }
             ws.close();
             window.location = "./login.html";
+        }
+    });
+}
+
+function addFriend(own_uid, friend_uid, success) {
+    let postBody = {
+        "own_uid": own_uid,
+        "friend_uid": friend_uid
+    };
+    $.ajax("/addFriend", {
+        type: "POST", data: postBody,
+        success: success,
+        error: function () {
+            location.reload();
+        }
+    });
+}
+
+function deleteFriend(own_uid, friend_uid, success) {
+    let postBody = {
+        "own_uid": own_uid,
+        "friend_uid": friend_uid
+    };
+    $.ajax("/deleteFriend", {
+        type: "POST", data: postBody,
+        success: success,
+        error: function () {
+            location.reload();
+        }
+    });
+}
+
+function getInformation(uid, success) {
+    let postBody = {
+        "uid": uid
+    };
+    $.ajax("/getInformation", {
+        type: "POST", data: postBody,
+        success: success,
+        error: function () {
+            location.reload();
+        }
+    });
+}
+
+function getHistory(own_uid, friend_uid, success) {
+    let postBody = {
+        "own_uid": own_uid,
+        "friend_uid": friend_uid
+    };
+    $.ajax("/getHistory", {
+        type: "POST", data: postBody,
+        success: success,
+        error: function () {
+            location.reload();
+        }
+    });
+}
+
+function getFriends(uid, success) {
+    let postBody = {
+        "uid": uid
+    };
+    $.ajax("/getFriends", {
+        type: "POST", data: postBody,
+        success: success,
+        error: function () {
+            location.reload();
         }
     });
 }
@@ -81,7 +144,31 @@ function wsOnError(ev) {
 }
 
 function wsOnMessage(msgEv) {
-    console.log(JSON.parse(msgEv.data));
+    let data = JSON.parse(msgEv.data);
+    console.log(data);
+    switch (data["cmd"]) {
+        case "forcedOffline": {
+
+            break;
+        }
+        case "acceptMessage": {
+
+            break;
+        }
+        case "sendMessage": {
+
+            break;
+        }
+    }
+}
+
+function sendMessage(receiver_uid, message) {
+    let data = {
+        "cmd": "sendMessage",
+        "receiver_uid": receiver_uid,
+        "msg": message
+    };
+    ws.send(JSON.stringify(data));
 }
 
 /* ↑↑这一块是写WebSocket的方法的↑↑ */
