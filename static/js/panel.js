@@ -1,10 +1,17 @@
 const own_uid = getQueryVariable("uid");
 const token = getQueryVariable("token");
-const ws = new WebSocket("ws://" + location.host + "/websocket/" + own_uid + "/" + token);
 const ownInfo = {}
 const friendsInfo = {};
 const messageRecord = {};
+let ws;
 
+$(document).ready(function () {
+    ws = new WebSocket("ws://" + location.host + "/websocket/" + own_uid + "/" + token);
+    ws.onopen = wsOnOpen;
+    ws.onclose = wsOnClose;
+    ws.onerror = wsOnError;
+    ws.onmessage = wsOnMessage;
+});
 
 init();
 
@@ -36,27 +43,11 @@ function init() {
                 for (let friend of data["msg"]) {
                     let friend_uid = friend["friend_uid"];
                     friendsInfo[friend_uid] = {};
+                    friendsInfo[friend_uid]["nick"] = friend["nick"];
+                    friendsInfo[friend_uid]["age"] = friend["age"];
+                    friendsInfo[friend_uid]["gender"] = friend["gender"];
+                    friendsInfo[friend_uid]["intro"] = friend["intro"];
                     messageRecord[friend_uid] = [];
-                    getInformation(friend_uid, function (data) {
-                        switch (data["code"]) {
-                            case "0": {
-                                friendsInfo[friend_uid]["nick"] = data["msg"]["nick"];
-                                friendsInfo[friend_uid]["age"] = data["msg"]["age"];
-                                friendsInfo[friend_uid]["gender"] = data["msg"]["gender"];
-                                friendsInfo[friend_uid]["intro"] = data["msg"]["intro"];
-                                break;
-                            }
-                            case "1": {
-                                alert(data["msg"]);
-                                break;
-                            }
-                            case "3" : {
-                                alert(data["msg"]);
-                                window.location = "./login.html";
-                                break;
-                            }
-                        }
-                    });
                 }
                 break;
             }
@@ -71,10 +62,6 @@ function init() {
             }
         }
     });
-    ws.onopen = wsOnOpen;
-    ws.onclose = wsOnClose;
-    ws.onerror = wsOnError;
-    ws.onmessage = wsOnMessage;
 }
 
 function getQueryVariable(variable) {
@@ -177,9 +164,13 @@ function getFriends(uid, success) {
 /* ↑↑这一块是写POST的方法的↑↑ */
 
 /* ↓↓这一块是写WebSocket的方法的↓↓ */
-function wsOnOpen(ev) {
+function wsOnOpen() {
     // console.log(ev);
     console.log("WebSocket成功接入服务器");
+    window.setInterval(function () {
+        console.log("30分钟Ping一次，防止断开");
+        ws.send(JSON.stringify({"cmd": "ping"}));
+    }, 30 * 60 * 1000);
 }
 
 function wsOnClose() {
@@ -213,6 +204,9 @@ function wsOnMessage(msgEv) {
                         "sender_uid": data["sender_uid"]
                     }
                 );
+                let actEvent = new CustomEvent("messageAccept",
+                    {"detail": {"uid": data["sender_uid"]}});
+                document.dispatchEvent(actEvent);
             }
             break;
         }

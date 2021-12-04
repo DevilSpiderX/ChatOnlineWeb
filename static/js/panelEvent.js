@@ -1,11 +1,33 @@
 $(document).ready(function () {
+    initMainContainer();
+    //导航栏
     $("#collapsibleNavbar li:nth-of-type(1)").click(nav_ownInfo_click);
+    $("#collapsibleNavbar li:nth-of-type(2)").click(nav_chat_click);
     $("#collapsibleNavbar li:nth-of-type(3)").click(nav_friends_li_click);
+    //主容器
+    $("body > div.container button.btn").click(on_sendContentButton_click);
+    $("#sendContent").keydown(on_sendContent_keydown);
+    //查找用户模态框
     $("#findUserModal button.btn.btn-success").click(findUserButton_click);
+    //用户信息模态框
     $("#informationModal [data-type=send]").click(info_sendButton_click);
     $("#informationModal [data-type=add]").click(info_addButton_click);
     $("#informationModal [data-type=delete]").click(info_deleteButton_click);
+    //接收新消息事件
+    document.addEventListener("messageAccept", on_messageAccept);
+    //聊天记录模态框
+    $("#historyModal button.btn.btn-success").click(historyModalButton_click);
 });
+
+
+function initMainContainer() {
+    $("body>div.container .card-header").empty();
+    let height = window.innerHeight - 190;
+    $("body>div.container .card-body").css("height", height).css("max-height", height);
+    $("body>div.container .my-row").empty();
+    $("#sendContent").attr("disabled", "");
+    $("body>div.container button.btn").attr("disabled", "");
+}
 
 function initInformationModal(nick, uid, age, gender, intro, sendHide, addHide, deleteHide) {
     let dataTags = $("#informationModal [data-value]");
@@ -45,8 +67,15 @@ function nav_ownInfo_click() {
         ownInfo["intro"], true, true, true);
 }
 
+function nav_chat_click() {
+    $("a.navbar-brand").css("color", "white");
+    let li_i = $("#collapsibleNavbar li:nth-of-type(2) i");
+    li_i.removeClass("fa-commenting");
+    li_i.addClass("fa-comment");
+}
+
 function nav_friends_li_click() {
-    $("#friendListModal ul")[0].innerHTML = "";
+    $("#friendListModal ul").empty();
     for (let uid in friendsInfo) {
         appendFriend(uid);
     }
@@ -68,8 +97,77 @@ function appendFriend(uid) {
     $("#friendListModal ul").append(friend);
 }
 
+function on_sendContentButton_click() {
+    let sendContent = $("#sendContent");
+    let value = sendContent.val();
+    sendContent.val("");
+    sendMessage($("body > div.container > .card").attr("data-uid"), value);
+    addOwnBubble(value, new Date().format("yyyy-MM-dd hh:mm:ss"));
+}
+
+function on_sendContent_keydown(ev) {
+    if (ev.key === "Enter") {
+        on_sendContentButton_click();
+    }
+}
+
+function openChat(uid, nick) {
+    initMainContainer();
+    $("#collapsibleNavbar").collapse('hide');
+    $("body > .container > .card").attr("data-uid", uid);
+    $("body > .container .card-header").html(nick + "<span class=\"uid-span\">(" + uid + ")</span>");
+    $("#sendContent").removeAttr("disabled");
+    $("body > .container button").removeAttr("disabled");
+    for (let index in messageRecord[uid]) {
+        let record = messageRecord[uid][index];
+        if (record["sender_uid"] === own_uid) {
+            addOwnBubble(record["msg"], record["time"].format("yyyy-MM-dd hh:mm:ss"));
+        } else if (record["sender_uid"] === uid) {
+            addFriendBubble(uid, record["msg"], record["time"].format("yyyy-MM-dd hh:mm:ss"));
+        }
+    }
+}
+
+function on_messageAccept(data) {
+    let uid = data.detail["uid"];
+    if ($("body > div.container .card").attr("data-uid") === uid) {
+        appendChat(uid);
+        let length = messageRecord[uid].length;
+        let record = messageRecord[uid][length - 1];
+        addFriendBubble(uid, record["msg"], record["time"].format("yyyy-MM-dd hh:mm:ss"));
+    } else {
+        $("a.navbar-brand").css("color", "yellow");
+        let li_i = $("#collapsibleNavbar li:nth-of-type(2) i");
+        li_i.removeClass("fa-comment");
+        li_i.addClass("fa-commenting");
+        appendNewChat(uid);
+    }
+}
+
+function addOwnBubble(msg, timeStr) {
+    let bubble = $("<div class=\"col-8 col-sm-7 col-md-6 col-lg-5 own-bubble\">" +
+        "<h6>" + timeStr + "</h6>" +
+        "<div data-value style=\"word-wrap:break-word;font-size: 25px;\">" + msg + "</div>" +
+        "</div>");
+    let myRow = $("body>div.container .my-row");
+    myRow.append(bubble);
+    $("body>div.container .pre-scrollable").scrollTop(myRow.height());
+}
+
+function addFriendBubble(uid, msg, timeStr) {
+    let bubble = $("<div class=\"col-8 col-sm-7 col-md-6 col-lg-5 friend-bubble\">" +
+        "<h6>" + timeStr + "</h6>" +
+        "<div data-value style=\"word-wrap:break-word;font-size: 25px;\">" + msg + "</div>" +
+        "</div>");
+    let myRow = $("body>div.container .my-row");
+    myRow.append(bubble);
+    $("body>div.container .pre-scrollable").scrollTop(myRow.height());
+}
+
 function findUserButton_click() {
-    let uid = $("#findUserModal input").val();
+    let input = $("#findUserModal input");
+    let uid = input.val();
+    input.val("");
     if (uid === "") {
         alert("账号不能为空");
     }
@@ -105,8 +203,12 @@ function findUserButton_click() {
     });
 }
 
-function info_sendButton_click() {
 
+function info_sendButton_click() {
+    let dataTags = $("#informationModal [data-value]");
+    let nick = $(dataTags[0]).attr("data-value");
+    let uid = $(dataTags[1]).attr("data-value");
+    openChat(uid, nick);
 }
 
 function info_addButton_click() {
@@ -165,4 +267,74 @@ function info_deleteButton_click() {
             }
         }
     });
+}
+
+function appendChat(uid) {
+    $("#chatListModal li[data-uid=" + uid + "]").remove();
+    let friend = $("<li class=\"nav-item findUserLi\" data-uid=\"" + uid + "\">" +
+        "<div data-dismiss=\"modal\">" +
+        "<span><i class=\"fa fa-commenting-o fa-fw\"></i></span>" +
+        friendsInfo[uid]["nick"] +
+        "<span class=\"uid-span\">(" + uid + ")</span>" +
+        "</div>" +
+        "</li>");
+    friend.click(function () {
+        openChat(uid, friendsInfo[uid]["nick"]);
+    })
+    $("#chatListModal ul").prepend(friend);
+}
+
+function appendNewChat(uid) {
+    $("#chatListModal li[data-uid=" + uid + "]").remove();
+    let friend = $("<li class=\"nav-item findUserLi\" data-uid=\"" + uid + "\">" +
+        "<div data-dismiss=\"modal\">" +
+        "<span><i class=\"fa fa-commenting-o fa-fw\"></i></span>" +
+        friendsInfo[uid]["nick"] +
+        "<span class=\"uid-span\">(" + uid + ")</span>" +
+        "<span class=\"uid-spin\"><i class=\"fa fa-spin fa-spinner\"></i></span>" +
+        "</div>" +
+        "</li>");
+    friend.click(function () {
+        $("#chatListModal li[data-uid=" + uid + "] span.uid-spin").remove();
+        openChat(uid, friendsInfo[uid]["nick"]);
+    })
+    $("#chatListModal ul").prepend(friend);
+}
+
+function historyModalButton_click() {
+    let input = $("#historyModal input.form-control");
+    let uid = input.val();
+    input.val("");
+    if (uid === "") {
+        alert("账号不能为空");
+    }
+    getHistory(own_uid, uid, function (data) {
+        switch (data["code"]) {
+            case "0": {
+                messageRecord[uid] = [];
+                for (let i in data["msg"]) {
+                    let record = data["msg"][i];
+                    messageRecord[uid].push(
+                        {
+                            "msg": record["message"],
+                            "time": new Date(record["time"]),
+                            "sender_uid": record["sender_uid"]
+                        }
+                    );
+                }
+                appendChat(uid);
+                openChat(uid, friendsInfo[uid]["nick"]);
+                break;
+            }
+            case "1": {
+                alert(data["msg"]);
+                break;
+            }
+            case "4": {
+                alert(data["msg"]);
+                window.location = "./login.html";
+                break;
+            }
+        }
+    })
 }

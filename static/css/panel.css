@@ -1,3 +1,7 @@
+html, body {
+    height: 100%;
+}
+
 .my-nav-item {
     margin: 2px 0;
     cursor: pointer;
@@ -21,4 +25,27 @@ div#informationModal .row > div {
     align-items: center;
     border-bottom: #aeafb2 1px solid;
     margin: 10px 0;
+}
+
+.my-row {
+    display: flex;
+    flex-direction: column;
+}
+
+div.friend-bubble {
+    color: white;
+    background-color: #28a745;
+    padding: 5px 10px;
+    margin: 10px 0;
+    border-radius: 1ex;
+}
+
+div.own-bubble {
+    color: white;
+    background-color: #007bff;
+    padding: 5px 10px;
+    margin: 10px 0;
+    text-align: end;
+    border-radius: 1ex;
+    align-self: flex-end;
 }
