@@ -9,53 +9,64 @@
     <script src="static/js/bootstrap.min.js"></script>
     <script src="static/js/date-formatter.js"></script>
     <script src="static/js/panel.js"></script>
+    <script src="static/js/panelEvent.js"></script>
     <!-- css -->
     <link href="static/css/bootstrap.min.css" rel="stylesheet">
     <link href="static/css/font-awesome.min.css" rel="stylesheet">
     <link href="static/css/panel.css" rel="stylesheet">
 </head>
 <body>
+<!-- 导航栏 -->
 <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+    <!-- 导航栏LOGO -->
     <a class="navbar-brand" href="#">ChatOnline</a>
 
+    <!-- 自适应弹出按钮 -->
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
         <span class="navbar-toggler-icon"></span>
     </button>
 
+    <!-- 导航栏菜单 -->
     <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <!-- 个人信息按钮 -->
         <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="javascript:">
+            <li class="nav-item my-nav-item">
+                <a class="nav-link" data-toggle="modal" href="#informationModal">
                     <i class="fa fa-user fa-fw"></i>
                     个人信息
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="javascript:">
+            <!-- 消息按钮 -->
+            <li class="nav-item my-nav-item">
+                <a class="nav-link">
                     <i class="fa fa-commenting fa-fw"></i>
                     消息
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="javascript:">
+            <!-- 好友按钮 -->
+            <li class="nav-item my-nav-item">
+                <a class="nav-link" data-toggle="modal" href="#friendListModal">
                     <i class="fa fa-users fa-fw"></i>
                     好友
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="javascript:">
+            <!-- 查找用户按钮 -->
+            <li class="nav-item my-nav-item">
+                <a class="nav-link" data-toggle="modal" href="#findUserModal">
                     <i class="fa fa-address-card fa-fw"></i>
                     查找用户
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="javascript:">
+            <!-- 聊天历史记录按钮 -->
+            <li class="nav-item my-nav-item">
+                <a class="nav-link">
                     <i class="fa fa-file-text fa-fw"></i>
                     聊天历史记录
                 </a>
             </li>
-            <li class="nav-item">
-                <button class="btn btn-danger">
+            <!-- 退出按钮 -->
+            <li class="nav-item my-nav-item">
+                <button class="btn btn-danger" onclick="logout()">
                     <i class="fa fa-close" style="font-size: 20px;"></i>
                     退出
                 </button>
@@ -64,8 +75,136 @@
     </div>
 </nav>
 
+<!-- 主容器 -->
 <div class="container">
 
+</div>
+
+<!-- 用户信息模态框 -->
+<div class="modal fade" id="informationModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- 用户信息模态框头部 -->
+            <div class="modal-header">
+                <h4><span><i class="fa fa-user-circle-o fa-fw"></i></span></h4>
+                <h4 class="modal-title" data-value></h4>
+                <button class="close" data-dismiss="modal">
+                    <span><i class="fa fa-close fa-fw"></i></span>
+                </button>
+            </div>
+
+            <!-- 用户信息模态框主体 -->
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <div><b>账号：</b></div>
+                            <div data-value></div>
+                        </div>
+                        <div class="col-12">
+                            <div><b>年龄：</b></div>
+                            <div data-value></div>
+                        </div>
+                        <div class="col-12">
+                            <div><b>性别：</b></div>
+                            <div data-value></div>
+                        </div>
+                        <div class="col-12">
+                            <div><b>简介：</b></div>
+                            <div data-value style="word-wrap:break-word;width: calc(100% - 44px)"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用户信息模态框底部 -->
+            <div class="modal-footer">
+                <button class="btn btn-success" data-dismiss="modal" data-type="send">发送消息</button>
+                <button class="btn btn-success" data-type="add">添加好友</button>
+                <button class="btn btn-danger" data-type="delete">删除好友</button>
+                <button class="btn btn-secondary" data-dismiss="modal">关闭</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- 好友列表模态框 -->
+<div class="modal fade" id="friendListModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- 好友列表模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title"><span><i class="fa fa-users fa-fw"></i> </span>好友列表</h4>
+                <button class="close" data-dismiss="modal">
+                    <span><i class="fa fa-close fa-fw"></i></span>
+                </button>
+            </div>
+
+            <!-- 好友列表模态框主体 -->
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <ul>
+                                <!-- 好友列表模板 -->
+                                <!--<li class="nav-item findUserLi">-->
+                                <!--<div data-dismiss="modal">-->
+                                <!--<span><i class="fa fa-user-circle-o fa-fw"></i></span>-->
+                                <!--ABC-->
+                                <!--<span class="uid-span">(001)</span>-->
+                                <!--</div>-->
+                                <!--</li>-->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 好友列表模态框底部 -->
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 查找用户模态框 -->
+<div class="modal fade" id="findUserModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- 查找用户模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title"><span><i class="fa fa-address-card fa-fw"></i> </span>查找用户</h4>
+                <button class="close" data-dismiss="modal">
+                    <span><i class="fa fa-close fa-fw"></i></span>
+                </button>
+            </div>
+
+            <!-- 查找用户模态框主体 -->
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-user fa-fw"></i></span>
+                            </div>
+                            <input class="form-control" type="text" placeholder="账号">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 查找用户模态框底部 -->
+            <div class="modal-footer">
+                <button class="btn btn-success" data-dismiss="modal">查找</button>
+                <button class="btn btn-secondary" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

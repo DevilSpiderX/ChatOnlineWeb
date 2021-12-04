@@ -1,0 +1,24 @@
+.my-nav-item {
+    margin: 2px 0;
+    cursor: pointer;
+}
+
+.findUserLi {
+    margin: 2px 0;
+    cursor: pointer;
+    font-size: 20px;
+    border: #aeafb2 1px solid;
+    border-radius: 1ex;
+}
+
+.uid-span {
+    color: gray;
+    font-size: 15px;
+}
+
+div#informationModal .row > div {
+    display: flex;
+    align-items: center;
+    border-bottom: #aeafb2 1px solid;
+    margin: 10px 0;
+}

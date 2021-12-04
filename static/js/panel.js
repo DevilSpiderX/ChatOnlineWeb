@@ -1,8 +1,10 @@
 const own_uid = getQueryVariable("uid");
 const token = getQueryVariable("token");
 const ws = new WebSocket("ws://" + location.host + "/websocket/" + own_uid + "/" + token);
+const ownInfo = {}
 const friendsInfo = {};
 const messageRecord = {};
+
 
 init();
 
@@ -13,7 +15,11 @@ function init() {
     getInformation(own_uid, function (data) {
         switch (data["code"]) {
             case "0" : {
-                let title = "用户面板 - " + data["msg"]["nick"] + " - ChatOnline"
+                ownInfo["nick"] = data["msg"]["nick"];
+                ownInfo["age"] = data["msg"]["age"];
+                ownInfo["gender"] = data["msg"]["gender"];
+                ownInfo["intro"] = data["msg"]["intro"];
+                let title = "用户面板 - " + ownInfo["nick"] + " - ChatOnline";
                 $("head title").text(title);
                 break;
             }
