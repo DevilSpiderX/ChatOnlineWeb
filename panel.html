@@ -53,7 +53,7 @@
             <!-- 查找用户按钮 -->
             <li class="nav-item my-nav-item">
                 <a class="nav-link" data-toggle="modal" href="#findUserModal">
-                    <i class="fa fa-address-card fa-fw"></i>
+                    <i class="fa fa-search fa-fw"></i>
                     查找用户
                 </a>
             </li>
@@ -63,6 +63,14 @@
                     <i class="fa fa-file-text fa-fw"></i>
                     聊天历史记录
                 </a>
+            </li>
+            <!-- 更改信息按钮 -->
+            <li class="nav-item my-nav-item">
+                <button class="btn btn-info" onclick="info_updateButton_click()"
+                        data-toggle="modal" data-target="#infoUpdateModal">
+                    <i class="fa fa-cog" style="font-size: 20px;"></i>
+                    更改信息
+                </button>
             </li>
             <!-- 退出按钮 -->
             <li class="nav-item my-nav-item">
@@ -134,6 +142,9 @@
                 <button class="btn btn-success" data-dismiss="modal" data-type="send">发送消息</button>
                 <button class="btn btn-success" data-type="add">添加好友</button>
                 <button class="btn btn-danger" data-type="delete">删除好友</button>
+                <button class="btn btn-info" data-dismiss="modal" data-type="update"
+                        data-toggle="modal" data-target="#infoUpdateModal">更改信息
+                </button>
                 <button class="btn btn-secondary" data-dismiss="modal">关闭</button>
             </div>
 
@@ -231,7 +242,7 @@
 
             <!-- 查找用户模态框头部 -->
             <div class="modal-header">
-                <h4 class="modal-title"><span><i class="fa fa-address-card fa-fw"></i> </span>查找用户</h4>
+                <h4 class="modal-title"><span><i class="fa fa-search fa-fw"></i> </span>查找用户</h4>
                 <button class="close" data-dismiss="modal">
                     <span><i class="fa fa-close fa-fw"></i></span>
                 </button>
@@ -291,6 +302,63 @@
             <div class="modal-footer">
                 <button class="btn btn-success" data-dismiss="modal">查找</button>
                 <button class="btn btn-secondary" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 用户信息更改模态框 -->
+<div class="modal fade" id="infoUpdateModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- 用户信息更改模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title"><span><i class="fa fa-cog fa-fw"></i></span>更改信息</h4>
+                <button class="close" data-dismiss="modal">
+                    <span><i class="fa fa-close fa-fw"></i></span>
+                </button>
+            </div>
+
+            <!--用户信息更改模态框主体 -->
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-font fa-fw"></i></span>
+                            </div>
+                            <input class="form-control" type="text" id="nickUpdate" placeholder="网名">
+                        </div>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-list-ol fa-fw"></i></span>
+                            </div>
+                            <input class="form-control" type="number" id="ageUpdate" placeholder="年龄">
+                        </div>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-venus-mars fa-fw"></i></span>
+                            </div>
+                            <select class="form-control" id="genderUpdate" name="genderUpdate" style="color: #6c757d;">
+                                <option value="男">男</option>
+                                <option value="女">女</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-info fa-fw"></i></span>
+                            </div>
+                            <input class="form-control" type="text" id="introUpdate" placeholder="简介">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用户信息更改模态框底部 -->
+            <div class="modal-footer">
+                <button class="btn btn-success">更改</button>
+                <button class="btn btn-secondary" data-dismiss="modal">取消</button>
             </div>
         </div>
     </div>

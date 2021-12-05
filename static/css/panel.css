@@ -3,7 +3,7 @@ html, body {
 }
 
 .my-nav-item {
-    margin: 2px 0;
+    margin: 2px 1px;
     cursor: pointer;
 }
 

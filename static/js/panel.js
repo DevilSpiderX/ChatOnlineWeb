@@ -1,8 +1,9 @@
 const own_uid = getQueryVariable("uid");
 const token = getQueryVariable("token");
-const ownInfo = {}
-const friendsInfo = {};
-const messageRecord = {};
+const ownInfo = {}//keys: nick, age, gender, intro
+const friendsInfo = {};//keys: uid   //friendsInfo[uid]->keys: nick, age, gender, intro
+const messageRecord = {};//keys: uid   //messageRecord[uid] is array
+// messageRecord[uid][n]->keys: msg, sender_uid, time
 let ws;
 
 $(document).ready(function () {
@@ -161,6 +162,23 @@ function getFriends(uid, success) {
     });
 }
 
+function updateInformation(uid, nick, age, gender, intro, success) {
+    let postBody = {
+        "uid": uid,
+        "nick": nick,
+        "age": age,
+        "gender": gender,
+        "intro": intro
+    };
+    $.ajax("/updateInformation", {
+        type: "POST", data: postBody,
+        success: success,
+        error: function () {
+            location.reload();
+        }
+    });
+}
+
 /* ↑↑这一块是写POST的方法的↑↑ */
 
 /* ↓↓这一块是写WebSocket的方法的↓↓ */
@@ -168,9 +186,9 @@ function wsOnOpen() {
     // console.log(ev);
     console.log("WebSocket成功接入服务器");
     window.setInterval(function () {
-        console.log("30分钟Ping一次，防止断开");
+        console.log("10分钟Ping一次，防止断开");
         ws.send(JSON.stringify({"cmd": "ping"}));
-    }, 30 * 60 * 1000);
+    }, 10 * 60 * 1000);
 }
 
 function wsOnClose() {

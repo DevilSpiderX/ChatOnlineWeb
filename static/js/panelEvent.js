@@ -13,10 +13,13 @@ $(document).ready(function () {
     $("#informationModal [data-type=send]").click(info_sendButton_click);
     $("#informationModal [data-type=add]").click(info_addButton_click);
     $("#informationModal [data-type=delete]").click(info_deleteButton_click);
+    $("#informationModal [data-type=update]").click(info_updateButton_click);
     //接收新消息事件
     document.addEventListener("messageAccept", on_messageAccept);
     //聊天记录模态框
     $("#historyModal button.btn.btn-success").click(historyModalButton_click);
+    //用户信息更改模态框
+    $("#infoUpdateModal button.btn.btn-success").click(updateInfoButton_click);
 });
 
 
@@ -29,7 +32,7 @@ function initMainContainer() {
     $("body>div.container button.btn").attr("disabled", "");
 }
 
-function initInformationModal(nick, uid, age, gender, intro, sendHide, addHide, deleteHide) {
+function initInformationModal(nick, uid, age, gender, intro, sendHide, addHide, deleteHide, updateHide) {
     let dataTags = $("#informationModal [data-value]");
 
     $(dataTags[0]).attr("data-value", nick);
@@ -60,11 +63,16 @@ function initInformationModal(nick, uid, age, gender, intro, sendHide, addHide, 
     } else {
         $(buttons[2]).show();
     }
+    if (updateHide) {
+        $(buttons[3]).hide();
+    } else {
+        $(buttons[3]).show();
+    }
 }
 
 function nav_ownInfo_click() {
     initInformationModal(ownInfo["nick"], own_uid, ownInfo["age"], ownInfo["gender"],
-        ownInfo["intro"], true, true, true);
+        ownInfo["intro"], true, true, true, false);
 }
 
 function nav_chat_click() {
@@ -91,7 +99,7 @@ function appendFriend(uid) {
         "</li>");
     friend.click(function () {
         initInformationModal(friendsInfo[uid]["nick"], uid, friendsInfo[uid]["age"], friendsInfo[uid]["gender"],
-            friendsInfo[uid]["intro"], false, true, false);
+            friendsInfo[uid]["intro"], false, true, false, true);
         $("#informationModal").modal("show");
     })
     $("#friendListModal ul").append(friend);
@@ -177,14 +185,14 @@ function findUserButton_click() {
                 let msg = data["msg"];
                 if (uid === own_uid) {
                     initInformationModal(msg["nick"], msg["uid"], msg["age"], msg["gender"], msg["intro"],
-                        true, true, true);
+                        true, true, true, false);
                 } else {
                     if (Object.keys(friendsInfo).indexOf(uid) !== -1) {
                         initInformationModal(msg["nick"], msg["uid"], msg["age"], msg["gender"], msg["intro"],
-                            false, true, false);
+                            false, true, false, true);
                     } else {
                         initInformationModal(msg["nick"], msg["uid"], msg["age"], msg["gender"], msg["intro"],
-                            true, false, true);
+                            true, false, true, true);
                     }
                 }
                 $("#informationModal").modal("show");
@@ -269,6 +277,13 @@ function info_deleteButton_click() {
     });
 }
 
+function info_updateButton_click() {
+    $("#nickUpdate").val(ownInfo["nick"]);
+    $("#ageUpdate").val(ownInfo["age"]);
+    $("#genderUpdate").val(ownInfo["gender"]);
+    $("#introUpdate").val(ownInfo["intro"]);
+}
+
 function appendChat(uid) {
     $("#chatListModal li[data-uid=" + uid + "]").remove();
     let friend = $("<li class=\"nav-item findUserLi\" data-uid=\"" + uid + "\">" +
@@ -337,4 +352,43 @@ function historyModalButton_click() {
             }
         }
     })
+}
+
+function updateInfoButton_click() {
+    let nick = $("#nickUpdate").val();
+    let age = $("#ageUpdate").val();
+    let gender = $("#genderUpdate").val();
+    let intro = $("#introUpdate").val();
+    if (nick === "") {
+        alert("网名不能为空");
+    }
+    if (age === "") {
+        age = 0;
+    }
+    if (intro === "") {
+        intro = " ";
+    }
+    updateInformation(own_uid, nick, age, gender, intro, function (data) {
+        console.log(data);
+        switch (data["code"]) {
+            case "0": {
+                ownInfo["nick"] = nick;
+                ownInfo["age"] = age;
+                ownInfo["gender"] = gender;
+                ownInfo["intro"] = intro;
+                alert(data["msg"]);
+                $("#infoUpdateModal").modal("hide");
+                break;
+            }
+            case "1": {
+                alert(data["msg"]);
+                break;
+            }
+            case "3": {
+                alert(data["msg"]);
+                window.location = "./login.html";
+                break;
+            }
+        }
+    });
 }
