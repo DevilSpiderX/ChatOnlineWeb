@@ -23,7 +23,7 @@ function on_button0_clicked() {
                     break;
                 }
                 case "1": {
-                    alert("密码错误");
+                    alert(data["msg"]);
                     break;
                 }
                 case "4": {

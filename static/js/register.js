@@ -1,5 +1,4 @@
 function on_register_clicked() {
-    <!--uid, pwd [,nick, age, gender, intro]-->
     let uid = $("#user").val();
     let pwd = $("#password").val();
     let nick = $("#nick").val();
@@ -25,7 +24,6 @@ function on_register_clicked() {
     $.ajax("/register", {
         type: "POST", data: postBody,
         success: function (data) {
-            //0 成功；1 失败；2 uid已存在；3 uid参数不存在；4 pwd参数不存在;
             switch (data["code"]) {
                 case "0": {
                     alert("注册成功");

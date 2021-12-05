@@ -6,42 +6,39 @@ const messageRecord = {};//keys: uid   //messageRecord[uid] is array
 // messageRecord[uid][n]->keys: msg, sender_uid, time
 let ws;
 
-$(document).ready(function () {
-    ws = new WebSocket("ws://" + location.host + "/websocket/" + own_uid + "/" + token);
-    ws.onopen = wsOnOpen;
-    ws.onclose = wsOnClose;
-    ws.onerror = wsOnError;
-    ws.onmessage = wsOnMessage;
-});
-
 init();
 
 /**
  * 初始化面板
  */
 function init() {
-    getInformation(own_uid, function (data) {
-        switch (data["code"]) {
+    getInformation(own_uid, function (resp) {
+        switch (resp["code"]) {
             case "0" : {
-                ownInfo["nick"] = data["msg"]["nick"];
-                ownInfo["age"] = data["msg"]["age"];
-                ownInfo["gender"] = data["msg"]["gender"];
-                ownInfo["intro"] = data["msg"]["intro"];
+                let data = resp["data"];
+                ownInfo["nick"] = data["nick"];
+                ownInfo["age"] = data["age"];
+                ownInfo["gender"] = data["gender"];
+                ownInfo["intro"] = data["intro"];
                 let title = "用户面板 - " + ownInfo["nick"] + " - ChatOnline";
                 $("head title").text(title);
                 break;
             }
-            case "3" : {
-                alert(data["msg"]);
+            case "1": {
+                location.reload();
+                break;
+            }
+            case "1001" : {
+                alert(resp["msg"]);
                 window.location = "./login.html";
                 break;
             }
         }
     });
-    getFriends(own_uid, function (data) {
-        switch (data["code"]) {
+    getFriends(own_uid, function (resp) {
+        switch (resp["code"]) {
             case "0" : {
-                for (let friend of data["msg"]) {
+                for (let friend of resp["data"]) {
                     let friend_uid = friend["friend_uid"];
                     friendsInfo[friend_uid] = {};
                     friendsInfo[friend_uid]["nick"] = friend["nick"];
@@ -53,15 +50,23 @@ function init() {
                 break;
             }
             case "1": {
-                console.log(data["msg"]);
+                console.log(resp["msg"]);
                 break;
             }
-            case "3" : {
-                alert(data["msg"]);
+            case "1001" :
+            case "1002" : {
+                alert(resp["msg"]);
                 window.location = "./login.html";
                 break;
             }
         }
+    });
+    $(document).ready(function () {
+        ws = new WebSocket("ws://" + location.host + "/websocket/" + own_uid + "/" + token);
+        ws.onopen = wsOnOpen;
+        ws.onclose = wsOnClose;
+        ws.onerror = wsOnError;
+        ws.onmessage = wsOnMessage;
     });
 }
 
@@ -84,9 +89,9 @@ function logout() {
     };
     $.ajax("/logout", {
         type: "POST", data: postBody,
-        success: function (data) {
-            if (data["code"] !== "0") {
-                alert(data["msg"]);
+        success: function (resp) {
+            if (resp["code"] !== "0") {
+                alert(resp["msg"]);
             }
             ws.close();
             window.location = "./login.html";
@@ -149,9 +154,9 @@ function getHistory(own_uid, friend_uid, success) {
     });
 }
 
-function getFriends(uid, success) {
+function getFriends(own_uid, success) {
     let postBody = {
-        "uid": uid
+        "own_uid": own_uid
     };
     $.ajax("/getFriends", {
         type: "POST", data: postBody,
@@ -162,16 +167,16 @@ function getFriends(uid, success) {
     });
 }
 
-function updateInformation(uid, nick, age, gender, intro, success) {
+function updateInformation(own_uid, nick, age, gender, intro, success) {
     let postBody = {
-        "uid": uid,
+        "own_uid": own_uid,
         "nick": nick,
         "age": age,
         "gender": gender,
         "intro": intro
     };
     $.ajax("/updateInformation", {
-        type: "POST", data: postBody,
+        type: "POST", data: JSON.stringify(postBody), contentType: "application/json",
         success: success,
         error: function () {
             location.reload();

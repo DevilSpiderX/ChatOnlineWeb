@@ -179,19 +179,19 @@ function findUserButton_click() {
     if (uid === "") {
         alert("账号不能为空");
     }
-    getInformation(uid, function (data) {
-        switch (data["code"]) {
+    getInformation(uid, function (resp) {
+        switch (resp["code"]) {
             case "0": {
-                let msg = data["msg"];
+                let data = resp["data"];
                 if (uid === own_uid) {
-                    initInformationModal(msg["nick"], msg["uid"], msg["age"], msg["gender"], msg["intro"],
+                    initInformationModal(data["nick"], data["uid"], data["age"], data["gender"], data["intro"],
                         true, true, true, false);
                 } else {
                     if (Object.keys(friendsInfo).indexOf(uid) !== -1) {
-                        initInformationModal(msg["nick"], msg["uid"], msg["age"], msg["gender"], msg["intro"],
+                        initInformationModal(data["nick"], data["uid"], data["age"], data["gender"], data["intro"],
                             false, true, false, true);
                     } else {
-                        initInformationModal(msg["nick"], msg["uid"], msg["age"], msg["gender"], msg["intro"],
+                        initInformationModal(data["nick"], data["uid"], data["age"], data["gender"], data["intro"],
                             true, false, true, true);
                     }
                 }
@@ -199,11 +199,11 @@ function findUserButton_click() {
                 break;
             }
             case "1": {
-                alert(data["msg"]);
+                alert(resp["msg"]);
                 break;
             }
             case "3": {
-                alert(data["msg"]);
+                alert(resp["msg"]);
                 window.location = "./login.html";
                 break;
             }
@@ -226,10 +226,10 @@ function info_addButton_click() {
     let age = Number($(dataTags[2]).attr("data-value"));
     let gender = $(dataTags[3]).attr("data-value");
     let intro = $(dataTags[4]).attr("data-value");
-    addFriend(own_uid, uid, function (data) {
-        switch (data["code"]) {
+    addFriend(own_uid, uid, function (resp) {
+        switch (resp["code"]) {
             case "0": {
-                alert(data["msg"]);
+                alert(resp["msg"]);
                 friendsInfo[uid] = {};
                 friendsInfo[uid]["nick"] = nick;
                 friendsInfo[uid]["age"] = age;
@@ -239,13 +239,14 @@ function info_addButton_click() {
                 break;
             }
             case "1":
-            case "5":
-            case "6": {
-                alert(data["msg"]);
+            case "4":
+            case "5": {
+                alert(resp["msg"]);
                 break;
             }
-            case "4": {
-                alert(data["msg"]);
+            case "1001":
+            case "1002": {
+                alert(resp["msg"]);
                 window.location = "./login.html";
                 break;
             }
@@ -256,20 +257,21 @@ function info_addButton_click() {
 function info_deleteButton_click() {
     let dataTags = $("#informationModal [data-value]");
     let uid = $(dataTags[1]).attr("data-value");
-    deleteFriend(own_uid, uid, function (data) {
-        switch (data["code"]) {
+    deleteFriend(own_uid, uid, function (resp) {
+        switch (resp["code"]) {
             case "0": {
-                alert(data["msg"]);
+                alert(resp["msg"]);
                 delete friendsInfo[uid];
                 $("#informationModal").modal("hide");
                 break;
             }
             case "1": {
-                alert(data["msg"]);
+                alert(resp["msg"]);
                 break;
             }
-            case "4": {
-                alert(data["msg"]);
+            case "1001":
+            case "1002": {
+                alert(resp["msg"]);
                 window.location = "./login.html";
                 break;
             }
@@ -323,12 +325,11 @@ function historyModalButton_click() {
     if (uid === "") {
         alert("账号不能为空");
     }
-    getHistory(own_uid, uid, function (data) {
-        switch (data["code"]) {
+    getHistory(own_uid, uid, function (resp) {
+        switch (resp["code"]) {
             case "0": {
                 messageRecord[uid] = [];
-                for (let i in data["msg"]) {
-                    let record = data["msg"][i];
+                for (let record of resp["data"]) {
                     messageRecord[uid].push(
                         {
                             "msg": record["message"],
@@ -342,11 +343,12 @@ function historyModalButton_click() {
                 break;
             }
             case "1": {
-                alert(data["msg"]);
+                alert(resp["msg"]);
                 break;
             }
-            case "4": {
-                alert(data["msg"]);
+            case "1001":
+            case "1002": {
+                alert(resp["msg"]);
                 window.location = "./login.html";
                 break;
             }
@@ -356,36 +358,30 @@ function historyModalButton_click() {
 
 function updateInfoButton_click() {
     let nick = $("#nickUpdate").val();
-    let age = $("#ageUpdate").val();
+    let age = Number($("#ageUpdate").val());
     let gender = $("#genderUpdate").val();
     let intro = $("#introUpdate").val();
     if (nick === "") {
         alert("网名不能为空");
     }
-    if (age === "") {
-        age = 0;
-    }
-    if (intro === "") {
-        intro = " ";
-    }
-    updateInformation(own_uid, nick, age, gender, intro, function (data) {
-        console.log(data);
-        switch (data["code"]) {
+    updateInformation(own_uid, nick, age, gender, intro, function (resp) {
+        switch (resp["code"]) {
             case "0": {
                 ownInfo["nick"] = nick;
                 ownInfo["age"] = age;
                 ownInfo["gender"] = gender;
                 ownInfo["intro"] = intro;
-                alert(data["msg"]);
+                alert(resp["msg"]);
                 $("#infoUpdateModal").modal("hide");
                 break;
             }
             case "1": {
-                alert(data["msg"]);
+                alert(resp["msg"]);
                 break;
             }
-            case "3": {
-                alert(data["msg"]);
+            case "1001":
+            case "1002": {
+                alert(resp["msg"]);
                 window.location = "./login.html";
                 break;
             }
