@@ -108,9 +108,11 @@ function appendFriend(uid) {
 function on_sendContentButton_click() {
     let sendContent = $("#sendContent");
     let value = sendContent.val();
+    let uid = $("body > div.container > .card").attr("data-uid");
     sendContent.val("");
-    sendMessage($("body > div.container > .card").attr("data-uid"), value);
+    sendMessage(uid, value);
     addOwnBubble(value, new Date().format("yyyy-MM-dd hh:mm:ss"));
+    appendChat(uid);
 }
 
 function on_sendContent_keydown(ev) {
@@ -121,7 +123,8 @@ function on_sendContent_keydown(ev) {
 
 function openChat(uid, nick) {
     initMainContainer();
-    $("#collapsibleNavbar").collapse('hide');
+    $("#chatListModal").modal("hide");
+    $("#collapsibleNavbar").collapse("hide");
     $("body > .container > .card").attr("data-uid", uid);
     $("body > .container .card-header").html(nick + "<span class=\"uid-span\">(" + uid + ")</span>");
     $("#sendContent").removeAttr("disabled");
@@ -289,7 +292,7 @@ function info_updateButton_click() {
 function appendChat(uid) {
     $("#chatListModal li[data-uid=" + uid + "]").remove();
     let friend = $("<li class=\"nav-item findUserLi\" data-uid=\"" + uid + "\">" +
-        "<div data-dismiss=\"modal\">" +
+        "<div>" +
         "<span><i class=\"fa fa-commenting-o fa-fw\"></i></span>" +
         friendsInfo[uid]["nick"] +
         "<span class=\"uid-span\">(" + uid + ")</span>" +
@@ -304,7 +307,7 @@ function appendChat(uid) {
 function appendNewChat(uid) {
     $("#chatListModal li[data-uid=" + uid + "]").remove();
     let friend = $("<li class=\"nav-item findUserLi\" data-uid=\"" + uid + "\">" +
-        "<div data-dismiss=\"modal\">" +
+        "<div>" +
         "<span><i class=\"fa fa-commenting-o fa-fw\"></i></span>" +
         friendsInfo[uid]["nick"] +
         "<span class=\"uid-span\">(" + uid + ")</span>" +

@@ -35,9 +35,35 @@ function init() {
             }
         }
     });
+    getFriendsImpl();
+    $(document).ready(function () {
+        ws = new WebSocket("ws://" + location.host + "/websocket/" + own_uid + "/" + token);
+        ws.onopen = wsOnOpen;
+        ws.onclose = wsOnClose;
+        ws.onerror = wsOnError;
+        ws.onmessage = wsOnMessage;
+    });
+}
+
+function getQueryVariable(variable) {
+    let query = window.location.search.substring(1);
+    let vars = query.split("&");
+    for (let i = 0; i < vars.length; i++) {
+        let pair = vars[i].split("=");
+        if (pair[0] === variable) {
+            return pair[1];
+        }
+    }
+    return "null";
+}
+
+function getFriendsImpl() {
     getFriends(own_uid, function (resp) {
         switch (resp["code"]) {
             case "0" : {
+                for (let key in friendsInfo) {
+                    delete friendsInfo[key];
+                }
                 for (let friend of resp["data"]) {
                     let friend_uid = friend["friend_uid"];
                     friendsInfo[friend_uid] = {};
@@ -61,25 +87,6 @@ function init() {
             }
         }
     });
-    $(document).ready(function () {
-        ws = new WebSocket("ws://" + location.host + "/websocket/" + own_uid + "/" + token);
-        ws.onopen = wsOnOpen;
-        ws.onclose = wsOnClose;
-        ws.onerror = wsOnError;
-        ws.onmessage = wsOnMessage;
-    });
-}
-
-function getQueryVariable(variable) {
-    let query = window.location.search.substring(1);
-    let vars = query.split("&");
-    for (let i = 0; i < vars.length; i++) {
-        let pair = vars[i].split("=");
-        if (pair[0] === variable) {
-            return pair[1];
-        }
-    }
-    return "null";
 }
 
 /* ↓↓这一块是写POST的方法的↓↓ */
@@ -208,47 +215,53 @@ function wsOnError(ev) {
 }
 
 function wsOnMessage(msgEv) {
-    let data = JSON.parse(msgEv.data);
-    console.log(data);
-    switch (data["cmd"]) {
+    let resp = JSON.parse(msgEv.data);
+    switch (resp["cmd"]) {
         case "forcedOffline": {
-            if (data["code"] === "0") {
-                alert(data["msg"]);
+            if (resp["code"] === "0") {
+                alert(resp["msg"]);
                 window.location = "./login.html";
             }
             break;
         }
         case "acceptMessage": {
-            if (data["code"] === "0") {
-                messageRecord[data["sender_uid"]].push(
+            if (resp["code"] === "0") {
+                messageRecord[resp["sender_uid"]].push(
                     {
-                        "msg": data["msg"],
-                        "time": new Date(data["time"]),
-                        "sender_uid": data["sender_uid"]
+                        "msg": resp["msg"],
+                        "time": new Date(resp["time"]),
+                        "sender_uid": resp["sender_uid"]
                     }
                 );
                 let actEvent = new CustomEvent("messageAccept",
-                    {"detail": {"uid": data["sender_uid"]}});
+                    {"detail": {"uid": resp["sender_uid"]}});
                 document.dispatchEvent(actEvent);
             }
             break;
         }
         case "sendMessage": {
-            switch (data["code"]) {
+            switch (resp["code"]) {
                 case "0": {
-                    console.log(data["msg"]);
+                    console.log(resp["msg"]);
                     break;
                 }
                 case "4" :
                 case "5": {
-                    alert("发送失败，" + data["msg"]);
+                    alert("发送失败，" + resp["msg"]);
                     break;
                 }
                 case "500" : {
-                    alert(data["msg"]);
+                    alert(resp["msg"]);
                     window.location = "./login.html";
                     break;
                 }
+            }
+            break;
+        }
+        case "friendInfoUpdate": {
+            if (resp["code"] === "0") {
+                console.log(resp["msg"]);
+                setTimeout(getFriendsImpl, 1000);
             }
             break;
         }
