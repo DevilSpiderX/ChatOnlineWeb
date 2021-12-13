@@ -77,6 +77,9 @@ function getFriendsImpl() {
             }
             case "1": {
                 console.log(resp["msg"]);
+                for (let key in friendsInfo) {
+                    delete friendsInfo[key];
+                }
                 break;
             }
             case "1001" :
