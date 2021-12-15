@@ -141,10 +141,10 @@ function openChat(uid, nick) {
 
 function on_messageAccept(data) {
     let uid = data.detail["uid"];
+    let length = messageRecord[uid].length;
+    let record = messageRecord[uid][length - 1];
     if ($("body > div.container .card").attr("data-uid") === uid) {
         appendChat(uid);
-        let length = messageRecord[uid].length;
-        let record = messageRecord[uid][length - 1];
         addFriendBubble(uid, record["msg"], record["time"].format("yyyy-MM-dd hh:mm:ss"));
     } else {
         $("a.navbar-brand").css("color", "yellow");
@@ -152,6 +152,18 @@ function on_messageAccept(data) {
         li_i.removeClass("fa-comment");
         li_i.addClass("fa-commenting");
         appendNewChat(uid);
+        if (allowNotify) {
+            const notify = new Notification(friendsInfo[uid]["nick"] + "（" + uid + "）", {
+                body: record["msg"], tag: uid, icon: "./favicon.ico", silent: true
+            });
+            notify.onclick = function () {
+                nav_chat_click();
+                openChat(uid, friendsInfo[uid]["nick"]);
+            };
+            setTimeout(function () {
+                notify.close();
+            }, 5 * 1000);
+        }
     }
 }
 

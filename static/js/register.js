@@ -23,8 +23,8 @@ function on_register_clicked() {
     }
     $.ajax("/register", {
         type: "POST", data: postBody,
-        success: function (data) {
-            switch (data["code"]) {
+        success: function (resp) {
+            switch (resp["code"]) {
                 case "0": {
                     alert("注册成功");
                     window.location = "./login.html";

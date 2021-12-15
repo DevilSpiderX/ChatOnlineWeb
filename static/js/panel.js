@@ -4,6 +4,7 @@ const ownInfo = {}//keys: nick, age, gender, intro
 const friendsInfo = {};//keys: uid   //friendsInfo[uid]->keys: nick, age, gender, intro
 const messageRecord = {};//keys: uid   //messageRecord[uid] is array
 // messageRecord[uid][n]->keys: msg, sender_uid, time
+let allowNotify = false;
 let ws;
 
 init();
@@ -42,6 +43,10 @@ function init() {
         ws.onclose = wsOnClose;
         ws.onerror = wsOnError;
         ws.onmessage = wsOnMessage;
+    });
+    Notification.requestPermission().then(function (status) {
+        console.log("用户是否允许通知： " + (status === "granted" ? "允许" : "拒绝"));
+        allowNotify = true;
     });
 }
 

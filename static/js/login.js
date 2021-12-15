@@ -15,15 +15,15 @@ function on_button0_clicked() {
     }
     $.ajax("/login", {
         type: "POST", data: postBody,
-        success: function (data) {
+        success: function (resp) {
             //0 成功；1 密码错误；2 uid参数不存在；3 pwd参数不存在;4 uid不存在；
-            switch (data["code"]) {
+            switch (resp["code"]) {
                 case "0": {
-                    window.location = "./panel.html?uid=" + uid + "&token=" + data["token"];
+                    window.location = "./panel.html?uid=" + uid + "&token=" + resp["token"];
                     break;
                 }
                 case "1": {
-                    alert(data["msg"]);
+                    alert(resp["msg"]);
                     break;
                 }
                 case "4": {
