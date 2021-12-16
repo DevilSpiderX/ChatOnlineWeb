@@ -9,6 +9,7 @@ $(document).ready(function () {
     $("#sendContent").keydown(on_sendContent_keydown);
     //查找用户模态框
     $("#findUserModal button.btn.btn-success").click(findUserButton_click);
+    $("#findUserModal .modal-body .input-group input").keydown(findUserInput_keydown);
     //用户信息模态框
     $("#informationModal [data-type=send]").click(info_sendButton_click);
     $("#informationModal [data-type=add]").click(info_addButton_click);
@@ -18,6 +19,7 @@ $(document).ready(function () {
     document.addEventListener("messageAccept", on_messageAccept);
     //聊天记录模态框
     $("#historyModal button.btn.btn-success").click(historyModalButton_click);
+    $("#historyModal .modal-body .input-group input").keydown(historyModalInput_keydown);
     //用户信息更改模态框
     $("#infoUpdateModal button.btn.btn-success").click(updateInfoButton_click);
 });
@@ -226,6 +228,13 @@ function findUserButton_click() {
     });
 }
 
+function findUserInput_keydown(ev) {
+    if (ev.key === "Enter") {
+        $("#findUserModal").modal("hide");
+        findUserButton_click();
+    }
+}
+
 
 function info_sendButton_click() {
     let dataTags = $("#informationModal [data-value]");
@@ -369,6 +378,13 @@ function historyModalButton_click() {
             }
         }
     })
+}
+
+function historyModalInput_keydown(ev) {
+    if (ev.key === "Enter") {
+        $("#historyModal").modal("hide");
+        historyModalButton_click();
+    }
 }
 
 function updateInfoButton_click() {
