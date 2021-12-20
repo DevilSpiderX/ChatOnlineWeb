@@ -46,7 +46,9 @@ function init() {
     });
     Notification.requestPermission().then(function (status) {
         console.log("用户是否允许通知： " + (status === "granted" ? "允许" : "拒绝"));
-        allowNotify = true;
+        if (status === "granted") {
+            allowNotify = true;
+        }
     });
 }
 

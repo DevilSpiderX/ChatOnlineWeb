@@ -1,5 +1,6 @@
 $(document).ready(function () {
     initMainContainer();
+    window.onresize = on_window_resize;
     //导航栏
     $("#collapsibleNavbar li:nth-of-type(1)").click(nav_ownInfo_click);
     $("#collapsibleNavbar li:nth-of-type(2)").click(nav_chat_click);
@@ -418,4 +419,9 @@ function updateInfoButton_click() {
             }
         }
     });
+}
+
+function on_window_resize() {
+    let height = window.innerHeight - 190;
+    $("body>div.container .card-body").css("height", height).css("max-height", height);
 }
